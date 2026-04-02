@@ -1,0 +1,46 @@
+services:
+  gateway:
+    build: ./security/SIA-GW
+    container_name: sia-gateway
+    ports:
+      - "8002:8002"
+    environment:
+      - USERS1_SERVICE_BASE_URL=http://site1:8000
+      - USERS2_SERVICE_BASE_URL=http://site2:8001
+      - DB_HOST=db
+    depends_on:
+      - site1
+      - site2
+      - db
+
+  site1:
+    build: ./site1/SIA-full
+    container_name: site1-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=dockersia
+      - DB_PASSWORD=1234
+
+  site2:
+    build: ./site2/SIA-site2
+    container_name: site2-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=dockersia
+      - DB_PASSWORD=1234
+
+  db:
+    image: mysql:8.0
+    container_name: sia-db
+    environment:
+      MYSQL_DATABASE: dockersia
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_HOST: "%"
