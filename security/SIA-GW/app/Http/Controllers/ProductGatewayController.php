@@ -3,54 +3,39 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\ProductService;
 
 class ProductGatewayController extends Controller
 {
-    private $request;
-    private $apiURL;
+    protected $productService;
 
-    public function __construct(Request $request){
-        $this->request = $request;
-        $this->apiURL = env('USERS2_SERVICE_BASE_URL') . '/products';
-    }
-
-    public function getProducts(){
-        $response = Http::get($this->apiURL);
-        return response()->json($response->json(), $response->status());
+    public function __construct()
+    {
+        $this->productService = new ProductService();
     }
 
     public function index()
     {
-        $response = Http::get($this->apiURL);
-        return response()->json($response->json(), $response->status());
+        return $this->productService->getProducts();
     }
 
-    public function add(Request $request){
-        $response = Http::post($this->apiURL, [
-            'product_name' => $request->product_name,
-            'price' => $request->price,
-            'stock' => $request->stock
-        ]);
-        return response()->json($response->json(), $response->status());
+    public function store(Request $request)
+    {
+        return $this->productService->createProduct($request->all());
     }
 
-    public function show($id){
-        $response = Http::get($this->apiURL.'/'.$id);
-        return response()->json($response->json(), $response->status());
+    public function show($id)
+    {
+        return $this->productService->showProduct($id);
     }
 
-    public function delete($id){
-        $response = Http::delete($this->apiURL.'/'.$id);
-        return response()->json($response->json(), $response->status());
+    public function update(Request $request, $id)
+    {
+        return $this->productService->updateProduct($id, $request->all());
     }
 
-    public function update(Request $request, $id){
-        $response = Http::put($this->apiURL.'/'.$id, [
-            'product_name' => $request->product_name,
-            'price' => $request->price,
-            'stock' => $request->stock
-        ]);
-        return response()->json($response->json(), $response->status());
+    public function delete($id)
+    {
+        return $this->productService->deleteProduct($id);
     }
 }
