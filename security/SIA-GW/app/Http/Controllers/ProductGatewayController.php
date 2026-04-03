@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Http;
 class ProductGatewayController extends Controller
 {
     private $request;
-    private $apiURL = "http://127.0.0.1:8001/products";
+    private $apiURL;
 
     public function __construct(Request $request){
         $this->request = $request;
+        $this->apiURL = env('USERS2_SERVICE_BASE_URL') . '/products';
     }
 
     public function getProducts(){
@@ -26,38 +27,30 @@ class ProductGatewayController extends Controller
     }
 
     public function add(Request $request){
-
         $response = Http::post($this->apiURL, [
             'product_name' => $request->product_name,
             'price' => $request->price,
             'stock' => $request->stock
         ]);
-
         return response()->json($response->json(), $response->status());
     }
 
     public function show($id){
-
         $response = Http::get($this->apiURL.'/'.$id);
-
         return response()->json($response->json(), $response->status());
     }
 
     public function delete($id){
-
         $response = Http::delete($this->apiURL.'/'.$id);
-
         return response()->json($response->json(), $response->status());
     }
 
     public function update(Request $request, $id){
-
         $response = Http::put($this->apiURL.'/'.$id, [
             'product_name' => $request->product_name,
             'price' => $request->price,
             'stock' => $request->stock
         ]);
-
         return response()->json($response->json(), $response->status());
     }
 }
